@@ -1,0 +1,73 @@
+﻿body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#chat {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    max-height: 80%;
+}
+
+#nameSection,
+#messageSection {
+    padding: 16px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+#messages {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    padding: 16px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+#messages div {
+    
+    margin-bottom: 8px;
+    padding: 8px;
+    background-color: #e9e9e9;
+    border-radius: 4px;
+}
+
+input,
+button {
+    font-size: 14px;
+    padding: 8px;
+    margin: 4px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    background-color: #008CBA;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #005f5f;
+}
+
+#status {
+    padding: 8px;
+    background-color: #f0f0f0;
+    font-size: 12px;
+    text-align: center;
+    color: red;
+}
