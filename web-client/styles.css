@@ -10,7 +10,7 @@
     overflow: hidden;
 }
 
-#chat {
+.chat {
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -48,7 +48,7 @@ input,
 button {
     font-size: 14px;
     padding: 8px;
-    margin: 4px 0;
+    margin: 4px;
     border: 1px solid #ccc;
     border-radius: 4px;
 }

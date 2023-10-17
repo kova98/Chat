@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -7,18 +7,29 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div id="chat">
-    <div id="status" hidden="true"></div>
-    <div id="nameSection">
-        <label for="nameInput">Name:</label>
-        <input type="text" id="nameInput" placeholder="Enter your name">
+
+<div id="app">
+    <div id="homePage" style="display: block;">
+        <div class="chat">
+            <div id="nameSection">
+                <label for="nameInput">Name:</label>
+                <input type="text" id="nameInput" placeholder="Enter your name">
+            </div>
+            <button onclick="connect()">Join</button>
+            <div class="status"></div>
+        </div>
     </div>
-    <div id="messages"></div>
-    <div id="messageSection">
-        <input type="text" id="messageInput" placeholder="Type a message">
-        <button onclick="sendMessage()">Send</button>
+    <div id="chatPage" style="display: none;">
+        <div class="chat">
+            <div class="status" hidden="hidden"></div>
+            <div id="messages"></div>
+            <div id="messageSection">
+                <input type="text" id="messageInput" placeholder="Type a message">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
     </div>
 </div>
-<script src="script.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
