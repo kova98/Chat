@@ -2,6 +2,11 @@
 let users = [];
 let name = null;
 
+let serverAddress = 'ws://164.92.191.239';
+// let serverAddress = 'ws://localhost:5000';
+
+const nameInput = document.getElementById('nameInput');
+
 const messageInput = document.getElementById('messageInput');
 messageInput.focus();
 messageInput.addEventListener('keypress', function (event) {
@@ -12,10 +17,9 @@ messageInput.addEventListener('keypress', function (event) {
 });
 
 function connect () {
-    // const nameInput = document.getElementById('nameInput');
     name = nameInput.value.trim();
     const nameParam = encodeURIComponent(name);
-    socket = new WebSocket('ws://localhost:5000/ws?name=' + nameParam);
+    socket = new WebSocket(serverAddress + '/ws?name=' + nameParam);
     setStatus('Connecting...');
     
     socket.onopen = goToChat;
