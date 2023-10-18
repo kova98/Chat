@@ -9,17 +9,17 @@ public class WebSocketService
 {
     private static readonly ConcurrentDictionary<string, WebSocket> Connections = new();
     
-    public async Task HandleWebSocket(HttpContext context)
+    public async Task HandleWebSocket(HttpContext context, string name)
     {
-        if (!context.WebSockets.IsWebSocketRequest)
+        var socket = await context.WebSockets.AcceptWebSocketAsync();
+        
+        if (Connections.ContainsKey(name))
         {
-            context.Response.StatusCode = 400;
+            await socket.CloseAsync(WebSocketCloseStatus.InvalidMessageType, $"Name '{name}' already taken" , default);
             return;
         }
         
-        var socket = await context.WebSockets.AcceptWebSocketAsync();
-        var socketId = Guid.NewGuid().ToString();
-        Connections.TryAdd(socketId, socket);
+        Connections.TryAdd(name, socket);
             
         await Receive(socket, async (result, buffer) =>
         {
@@ -31,7 +31,7 @@ public class WebSocketService
                     await BroadcastMessage(message);
                     return;
                 case WebSocketMessageType.Close:
-                    Connections.TryRemove(socketId, out _);
+                    Connections.TryRemove(name, out _);
                     await socket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
                     return;
                 case WebSocketMessageType.Binary:

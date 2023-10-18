@@ -6,16 +6,16 @@ builder.Services.AddSingleton<WebSocketService>();
 
 var app = builder.Build();
 app.UseWebSockets();
-
-app.MapGet("/ws", async (HttpContext context, WebSocketService ws) =>
+app.Map("/ws", async (HttpContext context, string name, WebSocketService ws) =>
 {
     if (context.WebSockets.IsWebSocketRequest)
     {
-        await ws.HandleWebSocket(context);
+        await ws.HandleWebSocket(context, name);
     }
     else
     {
         context.Response.StatusCode = 400;
+        await context.Response.WriteAsync("Expected a WebSocket request");
     }
 });
 
