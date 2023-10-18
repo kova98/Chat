@@ -1,4 +1,6 @@
 ﻿let socket = null;
+let users = [];
+let name = null;
 
 const messageInput = document.getElementById('messageInput');
 messageInput.focus();
@@ -10,8 +12,10 @@ messageInput.addEventListener('keypress', function (event) {
 });
 
 function connect () {
-    const name = encodeURIComponent(nameInput.value.trim());
-    socket = new WebSocket('ws://localhost:5000/ws?name=' + name);
+    // const nameInput = document.getElementById('nameInput');
+    name = nameInput.value.trim();
+    const nameParam = encodeURIComponent(name);
+    socket = new WebSocket('ws://localhost:5000/ws?name=' + nameParam);
     setStatus('Connecting...');
     
     socket.onopen = goToChat;
@@ -19,14 +23,19 @@ function connect () {
     socket.onerror = function (event) {
         setStatus('Could not reach server.');
     }
-
+ 
     socket.onmessage = function (event) {
-        const messageObject = JSON.parse(event.data);
-        const message = document.createElement('div');
-        message.innerText = messageObject.Name + ': ' + messageObject.Content;
-        
-        const messages = document.getElementById('messages');
-        messages.appendChild(message);
+        const message = JSON.parse(event.data);
+        switch (message.Type) {
+            case 'ChatMessage':
+                handleChatMessage(message);
+                break;
+            case 'UserList':
+                handleUserList(message);
+                break;
+            default: 
+                console.log('Unknown message type: ' + message.Type);
+        }
     };
 
     socket.onclose = function (event) {
@@ -37,13 +46,38 @@ function connect () {
     };
 }
 
+function handleUserList(message){
+    users = message.Users;
+    updateUsersDisplay();
+}
+
+function updateUsersDisplay() {
+    const usersList = document.getElementById('users');
+    usersList.innerHTML = '';
+    for (let i = 0; i < users.length; i++) {
+        const userElement = document.createElement('div');
+        userElement.className = 'user';
+        userElement.innerText = users[i];
+        if (users[i] === name) {
+            userElement.classList.add('current-user');
+        }
+        usersList.appendChild(userElement);
+    }
+}
+
+function handleChatMessage(messageObject) {
+    const message = document.createElement('div');
+    message.innerText = messageObject.Name + ': ' + messageObject.Content;
+
+    const messages = document.getElementById('messages');
+    messages.appendChild(message);
+}
+
 function sendMessage() {
-    const nameInput = document.getElementById('nameInput');
     const messageInput = document.getElementById('messageInput');
-    const nameText = nameInput.value.trim();
     const messageText = messageInput.value.trim();
-    if (nameText && messageText) {
-        const messageObj = { Name: nameText, Content: messageText };
+    if (name && messageText) {
+        const messageObj = { Type: 'ChatMessage', Name: name, Content: messageText}
         socket.send(JSON.stringify(messageObj));
         messageInput.value = '';
         messageInput.focus();

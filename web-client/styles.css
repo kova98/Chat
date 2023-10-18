@@ -19,6 +19,8 @@
     display: flex;
     flex-direction: column;
     max-height: 80%;
+    flex-grow: 1;
+    margin-right: 16px;
 }
 
 #nameSection,
@@ -70,4 +72,26 @@ button:hover {
     font-size: 12px;
     text-align: center;
     color: red;
+}
+
+.chat-container {
+    display: flex;
+    flex-direction: row;
+    max-width: 80%;
+    margin: auto;
+}
+
+#users {
+    width: 200px;  
+    border-left: 1px solid #ccc;  
+    padding: 16px;
+    overflow-y: auto;
+}
+
+.user {
+    margin-bottom: 8px;
+}
+
+.current-user {
+    font-weight: bold;
 }

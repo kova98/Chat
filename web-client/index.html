@@ -20,12 +20,17 @@
         </div>
     </div>
     <div class="page" id="chatPage" style="display: none;">
-        <div class="chat">
-            <div class="status" hidden></div>
-            <div id="messages"></div>
-            <div id="messageSection">
-                <input type="text" id="messageInput" placeholder="Type a message">
-                <button onclick="sendMessage()">Send</button>
+        <div class="status" hidden></div>
+        <div class="chat-container">
+            <div class="chat">
+                <div id="messages"></div>
+                <div id="messageSection">
+                    <input type="text" id="messageInput" placeholder="Type a message">
+                    <button onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+            <div id="users">
+                <div class="user">User 1</div>
             </div>
         </div>
     </div>

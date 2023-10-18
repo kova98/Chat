@@ -5,10 +5,10 @@ using System.Text.Json;
 
 namespace Chat.Api;
 
-public class WebSocketService
+public class WebSocketService(ILogger<WebSocketService> logger)
 {
     private static readonly ConcurrentDictionary<string, WebSocket> Connections = new();
-    
+
     public async Task HandleWebSocket(HttpContext context, string name)
     {
         var socket = await context.WebSockets.AcceptWebSocketAsync();
@@ -20,25 +20,58 @@ public class WebSocketService
         }
         
         Connections.TryAdd(name, socket);
-            
-        await Receive(socket, async (result, buffer) =>
+        
+        await SendMessage(socket, new UserList(Connections.Keys.ToArray()));
+
+        try
         {
-            switch (result.MessageType)
+            await Receive(socket, async (result, buffer) =>
             {
-                case WebSocketMessageType.Text:
-                    var messageString = Encoding.UTF8.GetString(buffer);
-                    var message = JsonSerializer.Deserialize<Message>(messageString);
-                    await BroadcastMessage(message);
-                    return;
-                case WebSocketMessageType.Close:
-                    Connections.TryRemove(name, out _);
-                    await socket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
-                    return;
-                case WebSocketMessageType.Binary:
-                default:
-                    return;
-            }
-        });
+                switch (result.MessageType)
+                {
+                    case WebSocketMessageType.Text:
+                    {
+                        var messageString = Encoding.UTF8.GetString(buffer);
+                        var message = JsonSerializer.Deserialize<Message>(messageString);
+                        switch (message.Type)
+                        {
+                            case "ChatMessage":
+                                var chatMessage = JsonSerializer.Deserialize<ChatMessage>(messageString);
+                                await BroadcastMessage(chatMessage);
+                                return;
+                            default:
+                                var error = $"Unknown message type '{message.Type}'";
+                                await socket.CloseAsync(WebSocketCloseStatus.InvalidMessageType, error, default);
+                                await RemoveUser(name);
+                                return;
+                        }
+                    }
+                    case WebSocketMessageType.Close:
+                        await RemoveUser(name);
+                        await socket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, default);
+                        return;
+                    case WebSocketMessageType.Binary:
+                    default:
+                        break;
+                }
+            });
+        }
+        catch (WebSocketException e)
+        {
+            await RemoveUser(name);
+            logger.LogWarning("WebSocketException: {asdfasdf}", e.Message);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e.Message);
+        }
+    }
+
+    private async Task RemoveUser(string name)
+    {
+        logger.LogInformation("User '{name}' disconnected.", name);
+        Connections.TryRemove(name, out _);
+        await BroadcastMessage(new UserList(Connections.Keys.ToArray()));
     }
 
     private static async Task Receive(WebSocket socket, Action<WebSocketReceiveResult, ArraySegment<byte>> handleMessage)
@@ -51,8 +84,19 @@ public class WebSocketService
         }
     }
 
-    private static async Task BroadcastMessage(Message? message)
+    private async Task SendMessage(WebSocket socket, object message)
     {
+        logger.LogInformation("Sending message: {message}", message);
+        
+        var messageString = JsonSerializer.Serialize(message);
+        var buffer = new ArraySegment<byte>(Encoding.UTF8.GetBytes(messageString));
+        await socket.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
+    }
+    
+    private async Task BroadcastMessage(object message)
+    {
+        logger.LogInformation("Broadcasting message: {message}", message);
+        
         foreach (var (key, socket) in Connections)
         {
             if (socket.State != WebSocketState.Open)
