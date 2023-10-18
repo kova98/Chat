@@ -1,4 +1,4 @@
-﻿var socket = null;
+﻿let socket = null;
 
 const messageInput = document.getElementById('messageInput');
 messageInput.focus();
@@ -12,18 +12,12 @@ messageInput.addEventListener('keypress', function (event) {
 function connect () {
     const name = encodeURIComponent(nameInput.value.trim());
     socket = new WebSocket('ws://localhost:5000/ws?name=' + name);
-
-    socket.onopen = goToChat();
+    setStatus('Connecting...');
+    
+    socket.onopen = goToChat;
 
     socket.onerror = function (event) {
-        const status = document.getElementsByClassName('status');
-        status.foreach(function (element) {
-            element.innerText = 'Lost connection to the server.';
-            element.hidden = false;
-        });
-            
-        status.innerText = 'Lost connection to the server.';
-        status.hidden = false;
+        setStatus('Could not reach server.');
     }
 
     socket.onmessage = function (event) {
@@ -36,11 +30,30 @@ function connect () {
     };
 
     socket.onclose = function (event) {
+        goToIndex();
         console.log('WebSocket is closed.', event);
-        const status = document.getElementById('status');
-        status.innerText = 'Lost connection to the server.';
-        status.hidden = false;
+        let status = event.reason === '' ? 'Connection closed.' : event.reason;
+        setStatus(status);
     };
+}
+
+function sendMessage() {
+    const nameInput = document.getElementById('nameInput');
+    const messageInput = document.getElementById('messageInput');
+    const nameText = nameInput.value.trim();
+    const messageText = messageInput.value.trim();
+    if (nameText && messageText) {
+        const messageObj = { Name: nameText, Content: messageText };
+        socket.send(JSON.stringify(messageObj));
+        messageInput.value = '';
+        messageInput.focus();
+    }
+}
+
+function setStatus(statusText) {
+    const status = currentPage().querySelector('.status');
+    status.innerText = statusText;
+    status.hidden = false;
 }
 
 function goToIndex() {
@@ -53,18 +66,10 @@ function goToChat() {
     document.getElementById('chatPage').style.display = 'block'
 }
 
-function sendMessage() {
-    const nameInput = document.getElementById('nameInput');
-    const messageInput = document.getElementById('messageInput');
-    const nameText = nameInput.value.trim();
-    const messageText = messageInput.value.trim();
-    if (nameText && messageText) {
-        const messageObj = { Name: nameText, Content: messageText };
-        window.socket.send(JSON.stringify(messageObj));
-        messageInput.value = '';
-        messageInput.focus();
-    }
+function currentPage() {
+    return document.querySelector('.page[style*="display: block"]');
 }
+
 
 
 

@@ -64,7 +64,7 @@ button:hover {
     background-color: #005f5f;
 }
 
-#status {
+.status {
     padding: 8px;
     background-color: #f0f0f0;
     font-size: 12px;
