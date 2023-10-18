@@ -5,3 +5,5 @@ record Message(string Type);
 record ChatMessage(string Name, string Content) : Message("ChatMessage");
 
 record UserList(string[] Users) : Message("UserList");
+
+record History(ChatMessage[] Messages) : Message("History");

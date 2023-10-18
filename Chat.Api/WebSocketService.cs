@@ -7,8 +7,9 @@ namespace Chat.Api;
 
 public class WebSocketService(ILogger<WebSocketService> logger)
 {
+    private static readonly ConcurrentQueue<ChatMessage> History = new();
     private static readonly ConcurrentDictionary<string, WebSocket> Connections = new();
-
+    
     public async Task HandleWebSocket(HttpContext context, string name)
     {
         var socket = await context.WebSockets.AcceptWebSocketAsync();
@@ -20,7 +21,9 @@ public class WebSocketService(ILogger<WebSocketService> logger)
         }
         
         Connections.TryAdd(name, socket);
+
         
+        await SendMessage(socket, new History(History.ToArray()));
         await SendMessage(socket, new UserList(Connections.Keys.ToArray()));
 
         try
@@ -37,6 +40,7 @@ public class WebSocketService(ILogger<WebSocketService> logger)
                         {
                             case "ChatMessage":
                                 var chatMessage = JsonSerializer.Deserialize<ChatMessage>(messageString);
+                                History.Enqueue(chatMessage);
                                 await BroadcastMessage(chatMessage);
                                 return;
                             default:
@@ -59,7 +63,7 @@ public class WebSocketService(ILogger<WebSocketService> logger)
         catch (WebSocketException e)
         {
             await RemoveUser(name);
-            logger.LogWarning("WebSocketException: {asdfasdf}", e.Message);
+            logger.LogWarning("WebSocketException: {message}", e.Message);
         }
         catch (Exception e)
         {

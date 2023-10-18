@@ -37,6 +37,9 @@ function connect () {
             case 'UserList':
                 handleUserList(message);
                 break;
+            case 'History':
+                handleHistory(message);
+                break;
             default: 
                 console.log('Unknown message type: ' + message.Type);
         }
@@ -48,6 +51,12 @@ function connect () {
         let status = event.reason === '' ? 'Connection closed.' : event.reason;
         setStatus(status);
     };
+}
+
+function handleHistory(message) {
+    for (let i = 0; i < message.Messages.length; i++) {
+        handleChatMessage(message.Messages[i]);
+    }
 }
 
 function handleUserList(message){
