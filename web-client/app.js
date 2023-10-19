@@ -6,15 +6,20 @@ let serverAddress = 'wss://playground.rokokovac.com/chat';
 // let serverAddress = 'ws://localhost:5000';
 
 const nameInput = document.getElementById('nameInput');
+enableEnterToSubmit(nameInput, connect);
+nameInput.focus();
 
 const messageInput = document.getElementById('messageInput');
-messageInput.focus();
-messageInput.addEventListener('keypress', function (event) {
-    if (event.key === 'Enter' && !event.shiftKey) {
-        event.preventDefault();
-        sendMessage();
-    }
-});
+enableEnterToSubmit(messageInput, sendMessage);
+
+function enableEnterToSubmit(input, action) {
+    input.addEventListener('keypress', function (event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            action();
+        }
+    });
+}
 
 function connect () {
     name = nameInput.value.trim();
@@ -22,7 +27,10 @@ function connect () {
     socket = new WebSocket(serverAddress + '/ws?name=' + nameParam);
     setStatus('Connecting...');
     
-    socket.onopen = goToChat;
+    socket.onopen = function (event) {
+        goToChat();
+        messageInput.focus();
+    }
 
     socket.onerror = function (event) {
         setStatus('Could not reach server.');
