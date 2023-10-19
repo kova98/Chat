@@ -21,22 +21,33 @@ body {
 .home-container {
     display: flex;
     flex-direction: column;
-    align-items: stretch; /* Changed from center to stretch to allow child elements to grow */
+    align-items: stretch;
     justify-content: center;
     background-color: var(--primary-color);
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 50px;
-    height: 30vh;
+    padding: 20px 50px 50px 50px;
     width: 50vw;
-    max-height: 100px;
     max-width: 300px;
 }
 
+
+.status {
+    margin-bottom: 12px;
+    color: var(--font-color);
+    text-align: center;
+    text-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 16px;
+}
+
 .button, .input {
-    flex-grow: 1; /* Allows the elements to grow and take up available space */
-    width: 100%; /* Makes sure the elements take the full width of the container */
-    margin: 4px 0; /* Adjusted margin to apply only to the top and bottom */
+    flex-grow: 1; 
+    width: 100%; 
+    margin: 4px 0; 
 }
 
 .button {
@@ -46,7 +57,7 @@ body {
     background-color: var(--accent-color);
     color: white;
     cursor: pointer;
-    max-height: 40px; /* Added max-height to prevent the button from growing too large */
+    max-height: 40px; 
 }
 
 .button:hover {

@@ -93,6 +93,7 @@ function handleChatMessage(messageObject) {
 
     const messages = document.getElementById('messages');
     messages.appendChild(message);
+    messages.scrollTop = messages.scrollHeight
 }
 
 function sendMessage() {
