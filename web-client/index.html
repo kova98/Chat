@@ -10,13 +10,10 @@
 
 <div id="app">
     <div class="page" id="homePage" style="display: block;">
-        <div class="chat">
+        <div class="home-container">
             <div class="status" hidden></div>
-            <div id="nameSection">
-                <label for="nameInput">Name:</label>
-                <input type="text" id="nameInput" placeholder="Enter your name">
-            </div>
-            <button onclick="connect()">Join</button>
+            <input class="input" type="text" id="nameInput" placeholder="Enter your name">
+            <button class="button" onclick="connect()">Join</button>
         </div>
     </div>
     <div class="page" id="chatPage" style="display: none;">
@@ -24,13 +21,13 @@
         <div class="chat-container">
             <div class="chat">
                 <div id="messages"></div>
-                <div id="messageSection">
-                    <input type="text" id="messageInput" placeholder="Type a message">
-                    <button onclick="sendMessage()">Send</button>
+                <div class="input-section">
+                    <input class="input" type="text" id="messageInput" placeholder="Type a message">
+                    <button class="button" onclick="sendMessage()">Send</button>
                 </div>
             </div>
-            <div id="users">
-                <div class="user">User 1</div>
+            <div class="users-list" id="users">
+                
             </div>
         </div>
     </div>

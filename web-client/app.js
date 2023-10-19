@@ -89,6 +89,7 @@ function updateUsersDisplay() {
 function handleChatMessage(messageObject) {
     const message = document.createElement('div');
     message.innerText = messageObject.Name + ': ' + messageObject.Content;
+    message.className = 'message';
 
     const messages = document.getElementById('messages');
     messages.appendChild(message);
