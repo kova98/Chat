@@ -1,4 +1,4 @@
-name: Dockerize And Deploy Server to VM
+name: Backend
 
 on:
   push:

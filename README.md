@@ -1,6 +1,8 @@
 # Chat
+[![Frontend](https://github.com/kova98/Chat/actions/workflows/static.yml/badge.svg)](https://github.com/kova98/Chat/actions/workflows/static.yml)
+[![Backend](https://github.com/kova98/Chat/actions/workflows/server.yml/badge.svg)](https://github.com/kova98/Chat/actions/workflows/server.yml)
 
-https://kova98.github.io/Chat/
+https://chat.rokokovac.com/
 
 # Features
 - Join with name
