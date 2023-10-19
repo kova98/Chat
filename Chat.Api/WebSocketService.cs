@@ -24,7 +24,7 @@ public class WebSocketService(ILogger<WebSocketService> logger)
 
         
         await SendMessage(socket, new History(History.ToArray()));
-        await SendMessage(socket, new UserList(Connections.Keys.ToArray()));
+        await BroadcastMessage(new UserList(Connections.Keys.ToArray()));
 
         try
         {
