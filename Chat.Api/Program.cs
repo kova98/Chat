@@ -6,6 +6,7 @@ builder.Services.AddSingleton<WebSocketService>();
 
 var app = builder.Build();
 app.UseWebSockets();
+app.MapGet("/" , () => "WebSocket server");
 app.Map("/ws", async (HttpContext context, string name, WebSocketService ws) =>
 {
     if (context.WebSockets.IsWebSocketRequest)
