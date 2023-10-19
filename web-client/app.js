@@ -2,7 +2,7 @@
 let users = [];
 let name = null;
 
-let serverAddress = 'ws://164.92.191.239';
+let serverAddress = 'wss://playground.rokokovac.com/chat';
 // let serverAddress = 'ws://localhost:5000';
 
 const nameInput = document.getElementById('nameInput');
