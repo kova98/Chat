@@ -64,7 +64,15 @@ function connect() {
         console.log('WebSocket is closed.', event);
         let status = event.reason === '' ? 'Connection closed.' : event.reason;
         setStatus(status);
+        clearHistory();
+        users = [];
+        updateUsersDisplay();
     };
+}
+
+function clearHistory() {
+    const messages = document.getElementById('messages');
+    messages.innerHTML = '';
 }
 
 function handleHistory(message) {
@@ -163,7 +171,3 @@ function goToChat() {
 function currentPage() {
     return document.querySelector('.page[style*="display: block"]');
 }
-
-
-
-
