@@ -10,7 +10,31 @@ enableEnterToSubmit(nameInput, connect);
 nameInput.focus();
 
 const messageInput = document.getElementById('messageInput');
-enableEnterToSubmit(messageInput, sendMessage);
+messageInput.addEventListener('keypress', function (event) {
+    const messageText = messageInput.value.trim();
+    if (event.key === 'Enter' && !event.shiftKey) {
+        if (messageText.length > 256){
+            return;
+        }
+        
+        event.preventDefault();
+        sendMessage();
+    }
+});
+
+messageInput.addEventListener("input", function(event) {
+    const error = document.getElementById('error-message');
+    error.hidden = true;
+    sendButton.disabled = false;
+    const messageText = messageInput.value.trim();
+    if (messageText.length > 256){
+        error.innerText = 'Message is too long';
+        error.hidden = false;
+        const sendButton = document.getElementById('sendButton');
+        sendButton.disabled = true;
+        return;
+    }
+});
 
 function enableEnterToSubmit(input, action) {
     input.addEventListener('keypress', function (event) {

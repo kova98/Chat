@@ -83,12 +83,19 @@ public class WebSocketService(ILogger<WebSocketService> logger)
         await BroadcastMessage(msg);
     }
 
-    private static async Task Receive(WebSocket socket, Action<WebSocketReceiveResult, ArraySegment<byte>> handleMessage)
+    private async Task Receive(WebSocket socket, Action<WebSocketReceiveResult, ArraySegment<byte>> handleMessage)
     {
-        var buffer = new byte[1024 * 4];
+        var buffer = new byte[1024 * 2];
         while (socket.State == WebSocketState.Open)
         {
             var result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), default);
+            if (result.EndOfMessage == false)
+            {
+                var name = Connections.FirstOrDefault(x => x.Value == socket).Key;
+                await RemoveUser(name);
+                await socket.CloseAsync(WebSocketCloseStatus.MessageTooBig, "Max message size is 2KiB.", default);
+                return;
+            }
             handleMessage(result, new ArraySegment<byte>(buffer, 0, result.Count));
         }
     }

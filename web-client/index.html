@@ -23,8 +23,9 @@
             <div class="chat">
                 <div id="messages"></div>
                 <div class="input-section">
+                    <div id="error-message" hidden></div>
                     <input class="input" type="text" id="messageInput" placeholder="Type a message">
-                    <button class="button" onclick="sendMessage()">Send</button>
+                    <button id="sendButton" class="button" onclick="sendMessage()">Send</button>
                 </div>
             </div>
             <div class="users-list" id="users">

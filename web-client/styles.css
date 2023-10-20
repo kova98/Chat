@@ -59,6 +59,15 @@ h1 {
     max-height: 40px; 
 }
 
+.button:disabled {
+    background-color: grey;
+    cursor: not-allowed;
+}
+
+.button:disabled:hover {
+    background-color: grey;
+}
+
 .button:hover {
     background-color: #E05A00;
 }
@@ -149,3 +158,6 @@ h1 {
     width: 12px; 
 }
 
+#error-message {
+    color: red;
+}
