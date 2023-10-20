@@ -1,6 +1,6 @@
 ﻿let socket = null;
 let users = [];
-let name = null;
+let name = localStorage.getItem('name');
 
 let serverAddress = 'wss://playground.rokokovac.com/chat';
 // let serverAddress = 'ws://localhost:5000';
@@ -8,6 +8,7 @@ let serverAddress = 'wss://playground.rokokovac.com/chat';
 const nameInput = document.getElementById('nameInput');
 enableEnterToSubmit(nameInput, connect);
 nameInput.focus();
+nameInput.value = name;
 
 const messageInput = document.getElementById('messageInput');
 messageInput.addEventListener('keypress', function (event) {
@@ -47,6 +48,7 @@ function enableEnterToSubmit(input, action) {
 
 function connect() {
     name = nameInput.value.trim();
+    localStorage.setItem("name", name);
     const nameParam = encodeURIComponent(name);
     socket = new WebSocket(serverAddress + '/ws?name=' + nameParam);
     setStatus('Connecting...');
