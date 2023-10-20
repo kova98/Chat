@@ -33,4 +33,4 @@ jobs:
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/chat:latest
           docker stop chat || true
           docker rm chat || true
-          docker run -d -p 5001:5001 --name chat ${{ secrets.DOCKERHUB_USERNAME }}/chat:latest
+          docker run -d -p 5001:5001 --restart always --name chat ${{ secrets.DOCKERHUB_USERNAME }}/chat:latest
