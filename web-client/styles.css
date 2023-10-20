@@ -31,7 +31,6 @@ body {
     max-width: 300px;
 }
 
-
 .status {
     margin-bottom: 12px;
     color: var(--font-color);
@@ -123,6 +122,10 @@ h1 {
     overflow-y: scroll;
     height: 100%;
     overflow-wrap: break-word;
+}
+
+.status-message {
+    color: grey;
 }
 
 .input-section {

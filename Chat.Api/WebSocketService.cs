@@ -7,7 +7,7 @@ namespace Chat.Api;
 
 public class WebSocketService(ILogger<WebSocketService> logger)
 {
-    private static readonly ConcurrentQueue<ChatMessage> History = new();
+    private static readonly ConcurrentQueue<Message> History = new();
     private static readonly ConcurrentDictionary<string, WebSocket> Connections = new();
     
     public async Task HandleWebSocket(HttpContext context, string name)
@@ -21,10 +21,14 @@ public class WebSocketService(ILogger<WebSocketService> logger)
         }
         
         Connections.TryAdd(name, socket);
-
+        
+        var everyoneElse = Connections.Where(x => x.Key != name).Select(x => x.Value).ToArray();
+        var userConnected = new UserConnected(name);
+        await BroadcastMessage(userConnected, everyoneElse);
+        History.Enqueue(userConnected);
         
         await SendMessage(socket, new History(History.ToArray()));
-        await BroadcastMessage(new UserList(Connections.Keys.ToArray()));
+        await SendMessage(socket, new UserList(Connections.Keys.ToArray()));
 
         try
         {
@@ -73,9 +77,10 @@ public class WebSocketService(ILogger<WebSocketService> logger)
 
     private async Task RemoveUser(string name)
     {
-        logger.LogInformation("User '{name}' disconnected.", name);
         Connections.TryRemove(name, out _);
-        await BroadcastMessage(new UserList(Connections.Keys.ToArray()));
+        var msg = new UserDisconnected(name);
+        History.Enqueue(msg);
+        await BroadcastMessage(msg);
     }
 
     private static async Task Receive(WebSocket socket, Action<WebSocketReceiveResult, ArraySegment<byte>> handleMessage)
@@ -88,7 +93,7 @@ public class WebSocketService(ILogger<WebSocketService> logger)
         }
     }
 
-    private async Task SendMessage(WebSocket socket, object message)
+    private async Task SendMessage(WebSocket socket, Message message)
     {
         logger.LogInformation("Sending message: {message}", message);
         
@@ -97,19 +102,20 @@ public class WebSocketService(ILogger<WebSocketService> logger)
         await socket.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
     }
     
-    private async Task BroadcastMessage(object message)
+    private async Task BroadcastMessage(Message message, IEnumerable<WebSocket>? receivers = null)
     {
         logger.LogInformation("Broadcasting message: {message}", message);
         
-        foreach (var (key, socket) in Connections)
+        var messageString = JsonSerializer.Serialize(message);
+        var buffer = new ArraySegment<byte>(Encoding.UTF8.GetBytes(messageString));
+        
+        foreach (var socket in receivers ?? Connections.Values)
         {
             if (socket.State != WebSocketState.Open)
             {
                 continue;
             }
             
-            var messageString = JsonSerializer.Serialize(message);
-            var buffer = new ArraySegment<byte>(Encoding.UTF8.GetBytes(messageString));
             await socket.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
         }
     }

@@ -21,12 +21,12 @@ function enableEnterToSubmit(input, action) {
     });
 }
 
-function connect () {
+function connect() {
     name = nameInput.value.trim();
     const nameParam = encodeURIComponent(name);
     socket = new WebSocket(serverAddress + '/ws?name=' + nameParam);
     setStatus('Connecting...');
-    
+
     socket.onopen = function (event) {
         goToChat();
         messageInput.focus();
@@ -35,7 +35,7 @@ function connect () {
     socket.onerror = function (event) {
         setStatus('Could not reach server.');
     }
- 
+
     socket.onmessage = function (event) {
         const message = JSON.parse(event.data);
         switch (message.Type) {
@@ -48,7 +48,13 @@ function connect () {
             case 'History':
                 handleHistory(message);
                 break;
-            default: 
+            case 'UserConnected':
+                handleUserConnected(message);
+                break;
+            case 'UserDisconnected':
+                handleUserDisconnected(message);
+                break;
+            default:
                 console.log('Unknown message type: ' + message.Type);
         }
     };
@@ -63,11 +69,38 @@ function connect () {
 
 function handleHistory(message) {
     for (let i = 0; i < message.Messages.length; i++) {
-        handleChatMessage(message.Messages[i]);
+        switch (message.Messages[i].Type) {
+            case 'ChatMessage':
+                handleChatMessage(message.Messages[i]);
+                break;
+            case 'UserConnected':
+                handleUserConnected(message.Messages[i]);
+                break;
+            case 'UserDisconnected':
+                handleUserDisconnected(message.Messages[i]);
+                break;
+            default:
+                console.log('Unknown message type: ' + message.Messages[i].Type);
+        }
     }
 }
 
-function handleUserList(message){
+function handleUserConnected(message) {
+    users.push(message.Name);
+    updateUsersDisplay();
+    addMessage('* ' + message.Name + ' connected.', 'status-message');
+}
+
+function handleUserDisconnected(message) {
+    const index = users.indexOf(message.Name);
+    if (index > -1) {
+        users.splice(index, 1);
+    }
+    updateUsersDisplay();
+    addMessage('* ' + message.Name + ' disconnected.', 'status-message');
+}
+
+function handleUserList(message) {
     users = message.Users;
     updateUsersDisplay();
 }
@@ -87,10 +120,14 @@ function updateUsersDisplay() {
 }
 
 function handleChatMessage(messageObject) {
+    const text = messageObject.Name + ': ' + messageObject.Content;
+    addMessage(text);
+}
+function addMessage(text, type) {
     const message = document.createElement('div');
-    message.innerText = messageObject.Name + ': ' + messageObject.Content;
-    message.className = 'message';
-
+    message.innerText = text;
+    message.className = type || 'message';
+    
     const messages = document.getElementById('messages');
     messages.appendChild(message);
     messages.scrollTop = messages.scrollHeight
@@ -100,7 +137,7 @@ function sendMessage() {
     const messageInput = document.getElementById('messageInput');
     const messageText = messageInput.value.trim();
     if (name && messageText) {
-        const messageObj = { Type: 'ChatMessage', Name: name, Content: messageText}
+        const messageObj = {Type: 'ChatMessage', Name: name, Content: messageText}
         socket.send(JSON.stringify(messageObj));
         messageInput.value = '';
         messageInput.focus();
