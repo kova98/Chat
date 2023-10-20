@@ -4,11 +4,13 @@
 
 https://chat.rokokovac.com/
 
+<img width="588" alt="chat" src="https://github.com/kova98/Chat/assets/28999034/2fd196d7-c3b8-4ad0-9c67-502a26cec731">
+
 # Features
 - Join with name
 - Send and receive messages
-- See active users list
-- See chat history
+- Active users list
+- Chat history
 
 ## Stack
 **Backend:** .NET 8   
