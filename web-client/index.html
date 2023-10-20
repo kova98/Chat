@@ -14,13 +14,16 @@
             <h1>Chat</h1>
             <div class="status" hidden></div>
             <input class="input" type="text" id="nameInput" placeholder="Enter your name">
-            <button class="button" onclick="connect()">Join</button>
+            <button id="connectButton" class="button" onclick="connect()">Join</button>
         </div>
     </div>
     <div class="page" id="chatPage" style="display: none;">
         <div class="status" hidden></div>
         <div class="chat-container">
+            
             <div class="chat">
+                <div class="users mobile-users-list">asdf</div>
+                
                 <div id="messages"></div>
                 <div class="input-section">
                     <div id="error-message" hidden></div>
@@ -28,9 +31,7 @@
                     <button id="sendButton" class="button" onclick="sendMessage()">Send</button>
                 </div>
             </div>
-            <div class="users-list" id="users">
-                
-            </div>
+            <div class="users users-list"></div>
         </div>
     </div>
 </div>

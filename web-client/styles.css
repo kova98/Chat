@@ -121,6 +121,10 @@ h1 {
     padding-left: 16px;
 }
 
+.mobile-users-list {
+    display:none;
+}
+
 .current-user {
     font-weight: bold;
 }
@@ -160,4 +164,37 @@ h1 {
 
 #error-message {
     color: red;
+}
+
+@media (max-width: 768px) {
+    .home-container {
+        width: 100vw;
+    }
+
+    .chat {
+        width: 100%;
+    }
+    
+    .chat-container {
+        width: 80vw;
+        height: 90vh;
+        padding: 30px;
+    }
+    
+    .users-list {
+        display:none;
+    }
+
+    .mobile-users-list {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Creates 3 equal-width columns */
+        gap: 4px; /* Optional: adds spacing between grid items */
+        margin-bottom: 4px;
+        border-bottom: 2px solid grey;
+        padding-bottom: 16px;
+    }
+    
+    .user {
+        margin-right: 10px;
+    }
 }

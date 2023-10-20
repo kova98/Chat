@@ -6,9 +6,30 @@ let serverAddress = 'wss://playground.rokokovac.com/chat';
 // let serverAddress = 'ws://localhost:5000';
 
 const nameInput = document.getElementById('nameInput');
-enableEnterToSubmit(nameInput, connect);
 nameInput.focus();
 nameInput.value = name;
+
+nameInput.addEventListener('keypress', function (event) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+        if (name.length > 16){
+            return;
+        }
+        event.preventDefault();
+        connect();
+    }
+});
+
+const connectButton = document.getElementById('connectButton');
+nameInput.addEventListener("input", function(event) {
+    setStatus('');
+    connectButton.disabled = false;
+    name = nameInput.value.trim();
+    if (name.length > 16){
+        setStatus('Name is too long');
+        connectButton.disabled = true;
+        return;
+    }
+});
 
 const messageInput = document.getElementById('messageInput');
 messageInput.addEventListener('keypress', function (event) {
@@ -37,17 +58,18 @@ messageInput.addEventListener("input", function(event) {
     }
 });
 
-function enableEnterToSubmit(input, action) {
-    input.addEventListener('keypress', function (event) {
-        if (event.key === 'Enter' && !event.shiftKey) {
-            event.preventDefault();
-            action();
-        }
-    });
-}
-
 function connect() {
     name = nameInput.value.trim();
+    if (!name) {
+        setStatus('Please enter the name.');
+        return;
+    }
+    
+    if (name.length > 16) {
+        setStatus('Name is too long.');
+        return;
+    }
+    
     localStorage.setItem("name", name);
     const nameParam = encodeURIComponent(name);
     socket = new WebSocket(serverAddress + '/ws?name=' + nameParam);
@@ -140,16 +162,18 @@ function handleUserList(message) {
 }
 
 function updateUsersDisplay() {
-    const usersList = document.getElementById('users');
-    usersList.innerHTML = '';
-    for (let i = 0; i < users.length; i++) {
-        const userElement = document.createElement('div');
-        userElement.className = 'user';
-        userElement.innerText = users[i];
-        if (users[i] === name) {
-            userElement.classList.add('current-user');
+    const usersList = document.getElementsByClassName('users');
+    for (let i = 0; i < usersList.length; i++) {
+        usersList[i].innerHTML = '';
+        for (let j = 0; j < users.length; j++) {
+            const userElement = document.createElement('div');
+            userElement.className = 'user';
+            userElement.innerText = users[j];
+            if (users[j] === name) {
+                userElement.classList.add('current-user');
+            }
+            usersList[i].appendChild(userElement);
         }
-        usersList.appendChild(userElement);
     }
 }
 
