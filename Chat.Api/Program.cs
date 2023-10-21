@@ -4,14 +4,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddLogging();
 builder.Services.AddSingleton<WebSocketService>();
 
+builder.Services.AddTransient<WebSocketAdapter>();
+builder.Services.AddSingleton<MessagingService>();
 var app = builder.Build();
 app.UseWebSockets();
 app.MapGet("/" , () => "WebSocket server");
-app.Map("/ws", async (HttpContext context, string name, WebSocketService ws) =>
+app.Map("/ws", async (HttpContext context, string name, WebSocketAdapter ws) =>
 {
     if (context.WebSockets.IsWebSocketRequest)
     {
-        await ws.HandleWebSocket(context, name);
+        await ws.HandleUser(context, name);
     }
     else
     {
