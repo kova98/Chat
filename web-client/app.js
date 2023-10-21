@@ -178,8 +178,21 @@ function updateUsersDisplay() {
 }
 
 function handleChatMessage(messageObject) {
-    const text = messageObject.Name + ': ' + messageObject.Content;
-    addMessage(text);
+    const message = document.createElement('div');
+
+    const messageName = document.createElement('span');
+    messageName.innerText = messageObject.Name + ': ';
+    messageName.className = 'message-name';
+    message.appendChild(messageName);
+
+    const messageContent = document.createElement('span');
+    messageContent.innerText = messageObject.Content;
+    messageContent.className = 'message-content';
+    message.appendChild(messageContent);
+
+    const messages = document.getElementById('messages');
+    messages.appendChild(message);
+    messages.scrollTop = messages.scrollHeight
 }
 function addMessage(text, type) {
     const message = document.createElement('div');

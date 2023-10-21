@@ -141,6 +141,11 @@ h1 {
     color: grey;
 }
 
+.message-name {
+    font-weight: bold;
+    color: var(--accent-color);
+}
+
 .input-section {
     margin-top: 16px;
 }
