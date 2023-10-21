@@ -17,7 +17,7 @@ function selectTransport(t) {
 
 selectTransport(transport);
 
- let serverAddress = 'wss://playground.rokokovac.com/chat';
+ let wsServerAddress = 'wss://playground.rokokovac.com/chat';
  let httpServerAddress = 'https://playground.rokokovac.com/chat';
 //let wsServerAddress = 'ws://localhost:5000';
 //let httpServerAddress = 'http://localhost:5000';
