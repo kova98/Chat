@@ -14,6 +14,16 @@
             <h1>Chat</h1>
             <div class="status" hidden></div>
             <input class="input" type="text" id="nameInput" placeholder="Enter your name">
+            <div class="transport-picker">
+                <button class="button transport-button"
+                        onclick="selectTransport('web-socket')"
+                        data-transport="web-socket">WebSocket
+                </button>
+                <button class="button transport-button"
+                        onclick="selectTransport('long-polling')"
+                        data-transport="long-polling">Long Polling
+                </button>
+            </div>
             <button id="connectButton" class="button" onclick="connect()">Join</button>
         </div>
     </div>

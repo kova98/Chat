@@ -83,8 +83,9 @@ public class WebSocketAdapter(MessagingService messagingService, ILogger<WebSock
         }
     }
 
-    public async Task SendMessage(string messageString)
+    public async Task SendMessage(Message message)
     {
+        var messageString = JsonSerializer.Serialize(message);
         var buffer = new ArraySegment<byte>(Encoding.UTF8.GetBytes(messageString));
         await Socket.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
     }

@@ -72,6 +72,36 @@ h1 {
     background-color: #E05A00;
 }
 
+.transport-picker {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.transport-button {
+    margin-right: 10px;
+    background-color: grey;
+}
+
+.transport-button.selected {
+    font-weight: bold;
+    background-color: var(--accent-color);
+}
+
+.transport-button:last-child {
+    margin-right: 0; 
+}
+
+.button:disabled {
+    background-color: grey;
+    cursor: not-allowed;
+}
+
+.button:disabled:hover {
+    background-color: grey;
+}
+
 .input {
     padding: 8px 16px; 
     border: 2px solid var(--background-color); 

@@ -8,14 +8,14 @@ namespace Chat.Api;
 [JsonDerivedType(typeof(UserConnected))]
 [JsonDerivedType(typeof(UserDisconnected))]
 [JsonDerivedType(typeof(History))]
-record Message(string Type);
+public record Message(string Type);
 
-record ChatMessage(string Name, string Content) : Message(nameof(ChatMessage));
+public record ChatMessage(string Name, string Content) : Message(nameof(ChatMessage));
 
-record UserList(string[] Users) : Message(nameof(UserList));
+public record UserList(string[] Users) : Message(nameof(UserList));
 
-record UserConnected(string Name) : Message(nameof(UserConnected));
+public record UserConnected(string Name) : Message(nameof(UserConnected));
 
-record UserDisconnected(string Name) : Message(nameof(UserDisconnected));
+public record UserDisconnected(string Name) : Message(nameof(UserDisconnected));
 
-record History(Message[] Messages) : Message(nameof(History));
+public record History(Message[] Messages) : Message(nameof(History));

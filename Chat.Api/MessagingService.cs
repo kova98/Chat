@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Text.Json;
 
 namespace Chat.Api;
 
@@ -37,20 +36,18 @@ public class MessagingService(ILogger<MessagingService> logger)
         return true;
     }
 
-    public async Task RemoveUser(string name)
+    public Task RemoveUser(string name)
     {
         Connections.TryRemove(name, out _);
         var msg = new UserDisconnected(name);
-        History.Enqueue(msg);
-        await BroadcastMessage(msg);
+        return BroadcastMessage(msg);
     }
 
-    private async Task SendMessage(IConnectionAdapter connection, Message message)
+    public Task SendMessage(IConnectionAdapter connection, Message message)
     {
         logger.LogInformation("Sending message: {message}", message);
 
-        var messageString = JsonSerializer.Serialize(message);
-        await connection.SendMessage(messageString);
+        return connection.SendMessage(message);
     }
     
     public async Task BroadcastMessage(Message message, IEnumerable<IConnectionAdapter>? receivers = null)
@@ -59,11 +56,9 @@ public class MessagingService(ILogger<MessagingService> logger)
      
         History.Enqueue(message);
         
-        var messageString = JsonSerializer.Serialize(message);
-        
         foreach (var connection in receivers ?? Connections.Values)
         {
-            await connection.SendMessage(messageString);
+            await connection.SendMessage(message);
         }
     }
 }
