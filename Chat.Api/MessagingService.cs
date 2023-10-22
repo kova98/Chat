@@ -15,11 +15,11 @@ public class MessagingService(ILogger<MessagingService> logger)
         }
         
         var userConnected = new UserConnected(name);
-        var everyoneElse = Connections.Where(x => x.Key != name).Select(x => x.Value).ToArray();
+        var everyoneElse = Connections.Where(x => x.Key != name).Select(x => x.Value);
         await BroadcastMessage(userConnected, everyoneElse);
 
-        await SendMessage(connection, new History(History.ToArray()));
-        await SendMessage(connection, new UserList(Connections.Keys.ToArray()));
+        await SendMessage(connection, new History(History.TakeLast(50)));
+        await SendMessage(connection, new UserList(Connections.Keys));
 
         return null;
     }

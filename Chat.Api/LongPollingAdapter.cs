@@ -10,8 +10,7 @@ public class LongPollingAdapter(MessagingService service, LongPollingConnectionR
     private HttpContext _context;
     private string _name;
     
-    // TODO: solve memory allocation issues
-    public async Task HandleLongPollingRequest(HttpContext ctx, CancellationToken ct, string name, string idString)
+    public async Task HandleLongPollingRequest(HttpContext ctx, CancellationToken ct, string name, string? idString)
     {
         _ = Guid.TryParse(idString, out var id);
         
@@ -49,22 +48,21 @@ public class LongPollingAdapter(MessagingService service, LongPollingConnectionR
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
         cts.CancelAfter(TimeSpan.FromSeconds(TimeoutInSeconds));
         
-        // TODO: potential problem, check memory allocations
         while (!cts.IsCancellationRequested)
         {
-            var buffer = repo.Buffers.GetOrAdd(name, _ => new List<Message>());
-            if (buffer.Count > 0)
+            if (repo.Buffers.TryGetValue(name, out var buffer))
             {
                 ctx.Response.StatusCode = (int)HttpStatusCode.OK;
-                var messageJson = JsonSerializer.Serialize(buffer);
-                await ctx.Response.WriteAsync(messageJson, ct);
-                buffer.Clear();
+                await JsonSerializer.SerializeAsync(ctx.Response.Body, buffer, cancellationToken: ct);
+                repo.Buffers.TryRemove(name, out _);
                 return;
             }
             
             // keep alive
             repo.Connections[name].LastSeen = DateTimeOffset.UtcNow;
-            await Task.Delay(500, ct);
+            
+            // smaller delay makes server more responsive, but decreases performance
+            await Task.Delay(50);
         }
         
         ctx.Response.StatusCode = (int)HttpStatusCode.NoContent;
@@ -78,9 +76,8 @@ public class LongPollingAdapter(MessagingService service, LongPollingConnectionR
 
     public Task SendMessage(Message message)
     {
-        var buffer = repo.Buffers.GetOrAdd(_name, _ => new List<Message>());
-        buffer.Add(message);
-        
+        // Could be further optimized by avoiding new list creation
+        repo.Buffers.GetOrAdd(_name, _ => new List<Message> { message });
         return Task.CompletedTask;
     }
 }

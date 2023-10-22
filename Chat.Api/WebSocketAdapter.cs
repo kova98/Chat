@@ -28,40 +28,37 @@ public class WebSocketAdapter(MessagingService messagingService, ILogger<WebSock
         {
             await Receive(Socket, name, async (result, buffer) =>
             {
-                switch (result.MessageType)
+                if (result.MessageType == WebSocketMessageType.Close)
                 {
-                    case WebSocketMessageType.Text:
-                    {
-                        var messageString = Encoding.UTF8.GetString(buffer);
-                        var message = JsonSerializer.Deserialize<Message>(messageString);
-                        switch (message.Type)
-                        {
-                            case "ChatMessage":
-                                var chatMessage = JsonSerializer.Deserialize<ChatMessage>(messageString);
-                                await messagingService.BroadcastMessage(chatMessage);
-                                return;
-                            default:
-                                var error = $"Unknown message type '{message.Type}'";
-                                await Socket.CloseAsync(WebSocketCloseStatus.InvalidMessageType, error, default);
-                                await messagingService.RemoveUser(name);
-                                return;
-                        }
-                    }
-                    case WebSocketMessageType.Close:
-                        await messagingService.RemoveUser(name);
-                        await Socket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, default);
-                        return;
-                    case WebSocketMessageType.Binary:
-                    default:
-                        break;
+                    await messagingService.RemoveUser(name);
+                    await Socket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, default);
+                    return;
                 }
+                
+                if (result.MessageType != WebSocketMessageType.Text)
+                {
+                    await Socket.CloseAsync(WebSocketCloseStatus.InvalidMessageType, "Expected text message", default);
+                    return;
+                }
+                
+                var messageString = Encoding.UTF8.GetString(buffer);
+                var message = JsonSerializer.Deserialize<ChatMessage>(messageString);
+                if (message == null)
+                { 
+                    var error = $"Invalid message '{messageString}'";
+                    await Socket.CloseAsync(WebSocketCloseStatus.InvalidMessageType, error, default);
+                    await messagingService.RemoveUser(name);
+                    return;
+                }
+                        
+                var chatMessage = JsonSerializer.Deserialize<ChatMessage>(messageString);
+                await messagingService.BroadcastMessage(chatMessage);
             });
         }
         catch (WebSocketException e)
         {
             await messagingService.RemoveUser(name);
             logger.LogError(e, "WebSocket error");
-            Socket.Dispose();
         }
     }
 
@@ -81,10 +78,17 @@ public class WebSocketAdapter(MessagingService messagingService, ILogger<WebSock
 
             handleMessage(result, new ArraySegment<byte>(buffer, 0, result.Count));
         }
+        
+        // await messagingService.RemoveUser(name);
     }
 
     public async Task SendMessage(Message message)
     {
+        // if (Socket.State != WebSocketState.Open)
+        // {
+        //     return;
+        // }
+        
         var messageString = JsonSerializer.Serialize(message);
         var buffer = new ArraySegment<byte>(Encoding.UTF8.GetBytes(messageString));
         await Socket.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);

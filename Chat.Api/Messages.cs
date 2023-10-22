@@ -12,10 +12,10 @@ public record Message(string Type);
 
 public record ChatMessage(string Name, string Content) : Message(nameof(ChatMessage));
 
-public record UserList(string[] Users) : Message(nameof(UserList));
+public record UserList(IEnumerable<string> Users) : Message(nameof(UserList));
 
 public record UserConnected(string Name) : Message(nameof(UserConnected));
 
 public record UserDisconnected(string Name) : Message(nameof(UserDisconnected));
 
-public record History(Message[] Messages) : Message(nameof(History));
+public record History(IEnumerable<Message> Messages) : Message(nameof(History));

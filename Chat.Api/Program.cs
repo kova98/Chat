@@ -33,7 +33,7 @@ app.Map("/ws", async (HttpContext context, string name, WebSocketAdapter ws) =>
     }
 });
 
-app.Map("/lp", async (HttpContext context, CancellationToken ct, LongPollingAdapter service, string name, string id) =>
+app.MapGet("/lp", async (HttpContext context, CancellationToken ct, LongPollingAdapter service, string name, string? id) =>
     await service.HandleLongPollingRequest(context, ct, name, id));
 
 app.MapPost("lp/message", async (MessagingService service, ChatMessage message) =>
