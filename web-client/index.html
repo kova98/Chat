@@ -19,9 +19,15 @@
                         onclick="selectTransport('web-socket')"
                         data-transport="web-socket">WebSocket
                 </button>
+            </div>
+            <div class="transport-picker">
                 <button class="button transport-button"
                         onclick="selectTransport('long-polling')"
                         data-transport="long-polling">Long Polling
+                </button>
+                <button class="button transport-button"
+                        onclick="selectTransport('server-sent-events')"
+                        data-transport="server-sent-events">Server-Sent Events
                 </button>
             </div>
             <button id="connectButton" class="button" onclick="connect()">Join</button>

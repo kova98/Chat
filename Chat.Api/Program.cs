@@ -4,6 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddLogging();
 builder.Services.AddSingleton<MessagingService>();
 builder.Services.AddTransient<WebSocketAdapter>();
+builder.Services.AddTransient<ServerSentEventsAdapter>();
 builder.Services.AddTransient<LongPollingAdapter>();
 builder.Services.AddSingleton<LongPollingUserRepository>();
 builder.Services.AddHostedService<LongPollingConnectionStatusChecker>();
@@ -42,5 +43,8 @@ app.MapPost("lp/message", async (MessagingService service, ChatMessage message) 
 
     return Results.Ok();
 });
+
+app.Map("sse", async (HttpContext context, CancellationToken ct, ServerSentEventsAdapter service, string name) =>
+    await service.HandleServerSentEventsRequest(context, ct, name));
 
 app.Run();
