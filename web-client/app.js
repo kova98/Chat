@@ -1,4 +1,5 @@
 ﻿let eventSource = null;
+let socket = null;
 let users = [];
 let name = localStorage.getItem("name");
 let history = [];
@@ -155,23 +156,23 @@ async function connectLongPolling() {
 
 function connectWebSocket() {
     const nameParam = encodeURIComponent(name);
-    eventSource = new WebSocket(wsServerAddress + "/ws?name=" + nameParam);
+    socket = new WebSocket(wsServerAddress + "/ws?name=" + nameParam);
 
-    eventSource.onopen = function (event) {
+    socket.onopen = function (event) {
         goToChat();
         messageInput.focus();
     };
 
-    eventSource.onerror = function (event) {
+    socket.onerror = function (event) {
         setStatus("Could not reach server.");
     };
 
-    eventSource.onmessage = function (event) {
+    socket.onmessage = function (event) {
         const message = JSON.parse(event.data);
         handleMessage(message);
     };
 
-    eventSource.onclose = function (event) {
+    socket.onclose = function (event) {
         goToIndex();
         console.log("WebSocket is closed.", event);
         let status = event.reason === "" ? "Connection closed." : event.reason;
@@ -365,7 +366,7 @@ function sendMessageHttp(message) {
 }
 
 function sendMessageWebSocket(message) {
-    eventSource.send(message);
+    socket.send(message);
 }
 
 function setStatus(statusText) {
