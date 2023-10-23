@@ -14,7 +14,7 @@ public class MessagingService(ILogger<MessagingService> logger)
             return $"Name '{name}' already taken";
         }
         
-        var userConnected = new UserConnected(name);
+        var userConnected = new UserConnected(name, GetTransport(connection));
         var everyoneElse = Connections.Where(x => x.Key != name).Select(x => x.Value);
         await BroadcastMessage(userConnected, everyoneElse);
 
@@ -23,6 +23,14 @@ public class MessagingService(ILogger<MessagingService> logger)
 
         return null;
     }
+
+    private string GetTransport(IConnectionAdapter conn) => conn switch
+    {
+        WebSocketAdapter _ => "WebSocket",
+        ServerSentEventsAdapter _ => "Server-Sent Events",
+        LongPollingAdapter _ => "Long Polling",
+        _ => "Unknown transport"
+    };
     
     private bool TryAddUser(string name, IConnectionAdapter connection)
     {

@@ -14,7 +14,7 @@ public record ChatMessage(string Name, string Content) : Message(nameof(ChatMess
 
 public record UserList(IEnumerable<string> Users) : Message(nameof(UserList));
 
-public record UserConnected(string Name) : Message(nameof(UserConnected));
+public record UserConnected(string Name, string Transport) : Message(nameof(UserConnected));
 
 public record UserDisconnected(string Name) : Message(nameof(UserDisconnected));
 

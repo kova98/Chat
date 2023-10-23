@@ -259,7 +259,8 @@ function handleHistory(message) {
 function handleUserConnected(message) {
     users.push(message.Name);
     updateUsersDisplay();
-    addMessage("* " + message.Name + " connected.", "status-message");
+    
+    addMessage(`*${message.Name} connected using ${message.Transport}.`, "status-message");
 }
 
 function handleUserDisconnected(message) {
