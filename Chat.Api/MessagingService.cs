@@ -18,7 +18,7 @@ public class MessagingService(ILogger<MessagingService> logger)
         var everyoneElse = Connections.Where(x => x.Key != name).Select(x => x.Value);
         await BroadcastMessage(userConnected, everyoneElse);
 
-        await SendMessage(connection, new History(History.TakeLast(50)));
+        await SendMessage(connection, new History(History.TakeLast(100)));
         await SendMessage(connection, new UserList(Connections.Keys));
 
         return null;
