@@ -1,6 +1,7 @@
 ﻿namespace Chat.Api;
 
-// TODO: solve memory allocation issues
+// As we cannot really rely on the client to keep telling us if he's active, 
+// we consider a lack of long poll for longer than KeepAliveTimerInMiliseconds to be a disconnect.
 public class KeepAliveService(LongPollingConnectionRepository repo, MessagingService service) : BackgroundService
 {
     private const int KeepAliveTimerInMiliseconds = 500;
@@ -14,6 +15,7 @@ public class KeepAliveService(LongPollingConnectionRepository repo, MessagingSer
                 if (DateTimeOffset.UtcNow - connection.Value.LastSeen > TimeSpan.FromMilliseconds(KeepAliveTimerInMiliseconds))
                 {
                     await service.RemoveUser(connection.Key);
+                    await connection.Value.Connection.CloseConnection("Timeout");
                     repo.Connections.TryRemove(connection.Key, out _);
                 }
             }

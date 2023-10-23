@@ -2,12 +2,12 @@
 
 namespace Chat.Api;
 
-public class LongPollingConnection(IConnectionAdapter connection, DateTimeOffset lastSeen, Guid id)
+public class LongPollingConnection(LongPollingAdapter connection, DateTimeOffset lastSeen, Guid id)
 {
-    public IConnectionAdapter Connection { get; set; } = connection;
+    public LongPollingAdapter Connection { get; } = connection;
     public DateTimeOffset LastSeen { get; set; } = lastSeen;
 
-    public Guid Id { get; set; } = id;
+    public Guid Id { get; } = id;
 }
 
 // Singleton repository allowing Transient LongPollingAdapter instances to share state.

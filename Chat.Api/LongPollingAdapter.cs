@@ -9,6 +9,7 @@ public class LongPollingAdapter(MessagingService service, LongPollingConnectionR
     
     private HttpContext _context;
     private string _name;
+    private CancellationTokenSource _cts;
     
     public async Task HandleLongPollingRequest(HttpContext ctx, CancellationToken ct, string name, string? idString)
     {
@@ -45,10 +46,10 @@ public class LongPollingAdapter(MessagingService service, LongPollingConnectionR
 
         ctx.Response.Headers.Add("X-Connection-Id", id.ToString());
         
-        using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
-        cts.CancelAfter(TimeSpan.FromSeconds(TimeoutInSeconds));
+        _cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        _cts.CancelAfter(TimeSpan.FromSeconds(TimeoutInSeconds));
         
-        while (!cts.IsCancellationRequested)
+        while (!_cts.IsCancellationRequested)
         {
             if (repo.Buffers.TryGetValue(name, out var buffer))
             {
@@ -58,9 +59,8 @@ public class LongPollingAdapter(MessagingService service, LongPollingConnectionR
                 return;
             }
             
-            // keep alive
-            repo.Connections[name].LastSeen = DateTimeOffset.UtcNow;
-            
+            KeepAlive();
+
             // smaller delay makes server more responsive, but decreases performance
             await Task.Delay(50);
         }
@@ -68,10 +68,21 @@ public class LongPollingAdapter(MessagingService service, LongPollingConnectionR
         ctx.Response.StatusCode = (int)HttpStatusCode.NoContent;
     }
 
-    public Task CloseConnection(string reason)
+    private void KeepAlive()
     {
+        repo.Connections.TryGetValue(_name, out var connection);
+        if (connection == null)
+        {
+            throw new InvalidOperationException("Tried to keep alive a connection that doesn't exist");
+        }
+
+        connection.LastSeen = DateTimeOffset.UtcNow;
+    }
+
+    public async Task CloseConnection(string reason)
+    {
+        await _cts.CancelAsync();
         repo.Connections.Remove(_name, out _);
-        return _context.Response.WriteAsync(reason);
     }
 
     public Task SendMessage(Message message)
