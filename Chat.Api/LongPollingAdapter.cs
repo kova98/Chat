@@ -86,7 +86,7 @@ public class LongPollingAdapter(MessagingService service, LongPollingUserReposit
     public Task SendMessage(Message message)
     {
         repo.Buffer
-            .GetOrAdd(_name, _ => new List<Message> { message })
+            .GetOrAdd(_name, _ => new List<Message>())
             .Add(message);
         
         return Task.CompletedTask;
