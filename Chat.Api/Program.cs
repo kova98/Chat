@@ -1,12 +1,12 @@
 using Chat.Api;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddHostedService<KeepAliveService>();
 builder.Services.AddLogging();
-builder.Services.AddTransient<WebSocketAdapter>();
 builder.Services.AddSingleton<MessagingService>();
+builder.Services.AddTransient<WebSocketAdapter>();
 builder.Services.AddTransient<LongPollingAdapter>();
-builder.Services.AddSingleton<LongPollingConnectionRepository>();
+builder.Services.AddSingleton<LongPollingUserRepository>();
+builder.Services.AddHostedService<LongPollingConnectionStatusChecker>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAnyOrigin", p => p
