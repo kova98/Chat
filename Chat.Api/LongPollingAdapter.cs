@@ -52,6 +52,8 @@ public class LongPollingAdapter(MessagingService service, LongPollingUserReposit
         
         while (!_timeoutCts.IsCancellationRequested)
         {
+            existingUser.LastSeen = DateTimeOffset.UtcNow;
+            
             if (userCt.IsCancellationRequested)
             {
                 // User closed the connection (left the page or closed the browser)
@@ -68,8 +70,6 @@ public class LongPollingAdapter(MessagingService service, LongPollingUserReposit
                 return;
             }
             
-            existingUser.LastSeen = DateTimeOffset.UtcNow;
-
             // smaller delay makes server more responsive, but decreases performance
             await Task.Delay(50);
         }
