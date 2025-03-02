@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using Chat.Api.Adapters;
 
 namespace Chat.Api;
 

@@ -1,0 +1,14 @@
+﻿### Long Poll
+
+GET http://localhost:5000/lp?name=User&id=a3f2c4b1-1b1b-4c4c-8d8d-9e9e9e9e9e9e
+Content-Type: application/json
+
+### Post a message
+
+POST http://localhost:5000/lp/message
+Content-Type: application/json
+
+{
+    "Name": "User",
+    "Content": "Hello World!"
+}

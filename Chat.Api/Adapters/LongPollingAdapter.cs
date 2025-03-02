@@ -1,13 +1,12 @@
 ﻿using System.Net;
 using System.Text.Json;
 
-namespace Chat.Api;
+namespace Chat.Api.Adapters;
 
 public class LongPollingAdapter(MessagingService service, LongPollingUserRepository repo) : IConnectionAdapter
 {
     private const int TimeoutInSeconds = 30;
     
-    private HttpContext _context;
     private string _name;
     private CancellationTokenSource _timeoutCts;
     
@@ -16,7 +15,6 @@ public class LongPollingAdapter(MessagingService service, LongPollingUserReposit
         _ = Guid.TryParse(idString, out var id);
         
         _name = name;
-        _context = ctx;
         
         _timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(new CancellationToken());
         _timeoutCts.CancelAfter(TimeSpan.FromSeconds(TimeoutInSeconds));

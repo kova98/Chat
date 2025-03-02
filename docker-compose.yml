@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  chat:
+    image: kova98k/chat:latest
+    ports:
+      - "9001:5001"
+    restart: always
+    volumes:
+      - chat:/data
+
+volumes:
+  chat: 

@@ -3,11 +3,12 @@
 namespace Chat.Api;
 
 // Required for polymorphic deserialization
-[JsonDerivedType(typeof(ChatMessage))]
-[JsonDerivedType(typeof(UserList))]
-[JsonDerivedType(typeof(UserConnected))]
-[JsonDerivedType(typeof(UserDisconnected))]
-[JsonDerivedType(typeof(History))]
+[JsonDerivedType(typeof(ChatMessage), typeDiscriminator: "ChatMessage")]
+[JsonDerivedType(typeof(UserList), typeDiscriminator: "UserList")]
+[JsonDerivedType(typeof(UserConnected), typeDiscriminator: "UserConnected")]
+[JsonDerivedType(typeof(UserDisconnected), typeDiscriminator: "UserDisconnected")]
+[JsonDerivedType(typeof(History), typeDiscriminator: "History")]
+[JsonPolymorphic(UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization)]
 public record Message(string Type);
 
 public record ChatMessage(string Name, string Content) : Message(nameof(ChatMessage));

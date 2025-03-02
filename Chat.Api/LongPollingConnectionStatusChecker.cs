@@ -1,4 +1,6 @@
-﻿namespace Chat.Api;
+﻿using Chat.Api.Adapters;
+
+namespace Chat.Api;
 
 // As we cannot rely on the client to close the connection gracefully,
 // We need to do a manual check to see if the user is still connected.

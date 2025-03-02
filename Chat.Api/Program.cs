@@ -1,4 +1,5 @@
 using Chat.Api;
+using Chat.Api.Adapters;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddLogging();
@@ -20,8 +21,8 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 app.UseCors("AllowAnyOrigin");
 app.UseWebSockets();
-app.MapGet("/" , () => "WebSocket server");
-app.Map("/ws", async (HttpContext context, string name, WebSocketAdapter ws) =>
+
+app.Map("/ws", async (string name, HttpContext context, WebSocketAdapter ws) =>
 {
     if (context.WebSockets.IsWebSocketRequest)
     {
@@ -34,17 +35,16 @@ app.Map("/ws", async (HttpContext context, string name, WebSocketAdapter ws) =>
     }
 });
 
-app.MapGet("/lp", async (HttpContext context, CancellationToken ct, LongPollingAdapter service, string name, string? id) =>
-    await service.HandleLongPollingRequest(context, ct, name, id));
+app.Map("sse", async (HttpContext context, CancellationToken ct, ServerSentEventsAdapter adapter, string name) =>
+    await adapter.HandleServerSentEventsRequest(context, ct, name));
+
+app.MapGet("/lp", async (HttpContext context, CancellationToken ct, LongPollingAdapter adapter, string name, string? id) =>
+    await adapter.HandleLongPollingRequest(context, ct, name, id));
 
 app.MapPost("lp/message", async (MessagingService service, ChatMessage message) =>
 {
     await service.BroadcastMessage(message);
-
     return Results.Ok();
 });
-
-app.Map("sse", async (HttpContext context, CancellationToken ct, ServerSentEventsAdapter service, string name) =>
-    await service.HandleServerSentEventsRequest(context, ct, name));
 
 app.Run();

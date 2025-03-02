@@ -1,8 +1,6 @@
-﻿namespace Chat.Api;
-
+﻿namespace Chat.Api.Adapters;
 
 public interface IConnectionAdapter
 {
-    Task CloseConnection(string reason);
     Task SendMessage(Message message);
 }

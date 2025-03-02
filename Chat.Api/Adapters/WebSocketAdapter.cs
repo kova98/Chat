@@ -2,7 +2,7 @@
 using System.Text;
 using System.Text.Json;
 
-namespace Chat.Api;
+namespace Chat.Api.Adapters;
 
 public class WebSocketAdapter(MessagingService messagingService, ILogger<WebSocketAdapter> logger) : IConnectionAdapter
 {

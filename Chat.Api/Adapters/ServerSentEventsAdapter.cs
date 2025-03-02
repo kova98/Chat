@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Text.Json;
 
-namespace Chat.Api;
+namespace Chat.Api.Adapters;
 
 public class ServerSentEventsAdapter(MessagingService service) : IConnectionAdapter
 {
