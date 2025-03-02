@@ -1,5 +1,6 @@
 ﻿let eventSource = null;
 let socket = null;
+let webTransport = null;
 let users = [];
 let name = localStorage.getItem("name");
 let history = [];
@@ -18,10 +19,11 @@ function selectTransport(t) {
 
 selectTransport(transport);
 
-let wsServerAddress = 'wss://playground.rokokovac.com/chat';
-let httpServerAddress = 'https://playground.rokokovac.com/chat';
-// let wsServerAddress = "ws://localhost:5000";
-// let httpServerAddress = "http://localhost:5000";
+// let wsServerAddress = 'wss://playground.rokokovac.com/chat';
+// let httpServerAddress = 'https://playground.rokokovac.com/chat';
+let wsServerAddress = "ws://localhost:5000";
+let httpServerAddress = "https://localhost:5000";
+let webTransportAddress = "https://localhost:5003";
 
 const nameInput = document.getElementById("nameInput");
 nameInput.focus();
@@ -107,12 +109,43 @@ function connect() {
         case "server-sent-events":
             connectServerSentEvents();
             break;
+        case "web-transport":
+            connectWebTransport();
+            break;
         default:
             console.error("Unknown transport: " + transport);
     }
 }
 
 let connectionId = null;
+
+async function initTransport(url) {
+
+}
+
+const CERTIFICATE = "hHLUixIQOUNj/b42Es/gPE6DzbjGgsgQ1+oLSlq7bqo=";
+
+async function connectWebTransport() {
+    try {
+        webTransport = new WebTransport(webTransportAddress + "/wt?name=" + name, {
+            serverCertificateHashes: [
+                {
+                    algorithm: "sha-256",
+                    value: Uint8Array.from(atob(CERTIFICATE), c => c.charCodeAt(0))
+                }
+            ]
+        });
+        await transport.ready;
+    } catch (error) {
+        goToIndex();
+        setStatus(error.message);
+        const msg = `Transport initialization failed.
+                 Reason: ${error.message}.
+                 Source: ${error.source}.
+                 Error code: ${error.streamErrorCode}.`;
+        console.log(msg);
+    }
+}
 
 async function connectLongPolling() {
     const nameParam = encodeURIComponent(name);
@@ -335,8 +368,10 @@ function sendMessage() {
                 sendMessageHttp(message);
                 break;
             case "web-socket":
-                sendMessageWebSocket(JSON.stringify(message));
+                sendMessageWebSocket(message);
                 break;
+            case "web-transport":
+                sendMessageWebTransport(message);
             default:
                 console.log("Unknown transport: " + transport);
         }
@@ -366,7 +401,11 @@ function sendMessageHttp(message) {
 }
 
 function sendMessageWebSocket(message) {
-    socket.send(message);
+    socket.send(JSON.stringify(message));
+}
+
+function sendMessageWebTransport(message) {
+    webTransport.send(JSON.stringify(message));
 }
 
 function setStatus(statusText) {
