@@ -31,7 +31,6 @@ jobs:
         username: ${{ secrets.SSH_USERNAME }}
         key: ${{ secrets.SSH_KEY }}
         script: | 
-          docker pull kova98k/chat:latest
-          docker stop chat || true
-          docker rm chat || true
-          docker run -d -p 9001:5001 --restart always --name chat kova98k/chat:latest
+          cd playground
+          docker compose pull chat
+          docker compose up -d chat
